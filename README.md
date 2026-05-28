@@ -68,7 +68,7 @@ images/owner_illust.png   店主(イラスト・店主紹介画面用)※任意
 
 ## クレジット
 
-- ゲームデザイン・実装: (お名前)
+- ゲームデザイン・実装: (葡萄🍇)
 - キャラクターイラスト: ChatGPT (DALL-E)で生成
 - AI協力: Claude (Anthropic)
 
