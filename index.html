@@ -1215,6 +1215,17 @@
     image-rendering: pixelated;
     margin: 8px 0;
   }
+  .owner-profile .owner-illust {
+    max-width: 200px;
+    max-height: 260px;
+    width: auto;
+    height: auto;
+    margin: 8px auto;
+    display: block;
+    border: 2px solid var(--ink);
+    background: var(--paper);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
   .owner-profile .owner-name {
     font-size: 14px;
     color: var(--ink);
@@ -2185,6 +2196,18 @@ function renderSprites(container) {
   });
 }
 
+// 画像ロード失敗時にドット絵canvasへ差し替えるグローバルハンドラ
+// imgタグに onerror="imgFallbackToSprite(this)" data-sprite="xxx" data-cls="yyy" を付ける
+window.imgFallbackToSprite = function(img) {
+  const spriteName = img.getAttribute('data-sprite');
+  const cls = img.getAttribute('data-cls') || '';
+  const canvas = document.createElement('canvas');
+  if (cls) canvas.className = cls;
+  canvas.setAttribute('data-sprite', spriteName);
+  img.replaceWith(canvas);
+  drawSprite(canvas, spriteName);
+};
+
 // ============================================================
 // ゲームデータ定義
 // ============================================================
@@ -3017,7 +3040,7 @@ function renderMorning(main, footer, banner) {
     game.girls.forEach(gid => {
       const g = GIRLS.find(x => x.id === gid);
       // 画像があれば<img>、なければcanvas(ドット絵)にフォールバック
-      html += `<img class="girl-icon" src="${g.dotImg}" alt="${g.name}" onerror="this.outerHTML='<canvas class=\\'girl-icon\\' data-sprite=\\'${g.sprite}\\'></canvas>'; renderSprites(document.getElementById('main-area'));">`;
+      html += `<img class="girl-icon" src="${g.dotImg}" alt="${g.name}" data-sprite="${g.sprite}" data-cls="girl-icon" onerror="imgFallbackToSprite(this)">`;
     });
     const names = game.girls.map(gid => GIRLS.find(x => x.id === gid).name).join('・');
     html += `<div class="girl-icon-info"><span class="girl-name">${names}</span><br>今日もよろしくお願いします!</div>`;
@@ -4196,10 +4219,9 @@ window.advanceToNextChapter = function() {
 function showStoryEvent(event, onClose) {
   $('modal-header').textContent = event.title;
   const girl = GIRLS.find(g => g.id === event.girlId);
-  const imgFallback = `onerror="this.outerHTML='<canvas data-sprite=\\'${girl.sprite}\\'></canvas>'; renderSprites(document.getElementById('modal-body'));"`;
   $('modal-body').innerHTML = `
     <div class="story-event">
-      <img class="story-event-img" src="${girl.illustImg}" alt="${girl.name}" ${imgFallback}>
+      <img class="story-event-img" src="${girl.illustImg}" alt="${girl.name}" data-sprite="${girl.sprite}" onerror="imgFallbackToSprite(this)">
       <div class="story-event-body">${event.body}</div>
       <div class="story-event-effect">${event.effect}</div>
       <div class="story-event-closing">${event.closingLine}</div>
@@ -4304,12 +4326,10 @@ function showRewardChoice() {
 
 function showGirlUnlockModal(girl, onContinue) {
   $('modal-header').textContent = '✿ 新たな仲間 ✿';
-  // 画像があれば<img>、失敗したらcanvas(ドット絵)にフォールバック
-  const imgFallback = `onerror="this.outerHTML='<canvas data-sprite=\\'${girl.sprite}\\'></canvas>'; renderSprites(document.getElementById('modal-body'));"`;
   $('modal-body').innerHTML = `
     <div class="girl-unlock">
       <div class="girl-title">看板娘が仲間に!</div>
-      <img class="girl-illust" src="${girl.illustImg}" alt="${girl.name}" ${imgFallback}>
+      <img class="girl-illust" src="${girl.illustImg}" alt="${girl.name}" data-sprite="${girl.sprite}" onerror="imgFallbackToSprite(this)">
       <div class="girl-fullname">${girl.name}</div>
       <p style="margin:8px 0;font-size:11px;">「${girl.intro}」</p>
       <div class="girl-skill">${girl.skill}</div>
@@ -4667,8 +4687,8 @@ function showOwnerProfile() {
   $('modal-header').textContent = '🔍 店主について';
   $('modal-body').innerHTML = `
     <div class="owner-profile">
-      <canvas data-sprite="owner"></canvas>
-      <div class="owner-name">店主</div>
+      <img class="owner-illust" src="images/owner_illust.png" alt="店主" data-sprite="owner" onerror="imgFallbackToSprite(this)">
+      <div class="owner-name">店主 ・ 黒井</div>
       <div class="owner-role">~ 元・情報屋 ~</div>
       <div>
         <span class="owner-tag">OSINT</span>
