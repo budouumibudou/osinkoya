@@ -1167,6 +1167,31 @@
 
   /* ランキング表示 */
   .ranking-list { padding: 4px; }
+
+  /* ランキングのタブ切替 */
+  .ranking-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+  .ranking-tab {
+    flex: 1;
+    background: var(--paper-dark);
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    padding: 6px 4px;
+    font-size: 11px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .ranking-tab.active {
+    background: var(--ink);
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+  .ranking-tab:active {
+    transform: translate(1px, 1px);
+  }
   .ranking-entry {
     display: grid;
     grid-template-columns: 32px 1fr auto;
@@ -2218,20 +2243,35 @@ const SEASON_ICONS = {春: '🌸', 夏: '🌊', 秋: '🍁', 冬: '❄'};
 // 漬物の元(野菜)定義
 // id, name, sprite, baseCost, season (利用可能な季節), pickleDays (適切な漬け日数), category
 const VEGETABLES = [
-  // 通年
-  { id: 'cucumber', name: 'きゅうり', sprite: 'cucumber', baseCost: 80, seasons: ['春','夏','秋','冬'], pickleDays: 1, hint: '浅漬け向き', flavors: ['さっぱり'] },
-  { id: 'daikon', name: '大根',     sprite: 'daikon',   baseCost: 120, seasons: ['秋','冬','春'],     pickleDays: 3, hint: '沢庵に', flavors: ['塩辛'] },
-  { id: 'cabbage', name: '白菜',    sprite: 'cabbage',  baseCost: 150, seasons: ['秋','冬'],          pickleDays: 2, hint: '冬の定番', flavors: ['さっぱり','塩辛'] },
-  { id: 'carrot', name: 'にんじん', sprite: 'carrot',   baseCost: 90,  seasons: ['春','夏','秋','冬'], pickleDays: 2, hint: '彩りに', flavors: ['甘味'] },
-  { id: 'ginger', name: '生姜',     sprite: 'ginger',   baseCost: 100, seasons: ['夏','秋'],          pickleDays: 1, hint: 'ガリ向き・辛口', flavors: ['辛口'] },
-  // 季節限定
+  // === 通年野菜 ===
+  { id: 'cucumber', name: 'きゅうり', sprite: 'cucumber', baseCost: 80, seasons: ['春','夏','秋','冬'], pickleDays: 1, hint: '浅漬け向き・さっぱり', flavors: ['さっぱり'] },
+  { id: 'daikon', name: '大根',     sprite: 'daikon',   baseCost: 120, seasons: ['秋','冬','春'],     pickleDays: 3, hint: '沢庵に', flavors: ['塩辛','甘味'] },
+  { id: 'carrot', name: 'にんじん', sprite: 'carrot',   baseCost: 90,  seasons: ['春','夏','秋','冬'], pickleDays: 2, hint: '彩り・ほんのり甘い', flavors: ['甘味'] },
+
+  // === 春 ===
+  { id: 'takenoko', name: 'たけのこ', sprite: 'takenoko', baseCost: 250, seasons: ['春'],          pickleDays: 3, hint: '春の高級品・上品な甘み', flavors: ['さっぱり','甘味'] },
+  { id: 'cabbage_spring', name: '春キャベツ', sprite: 'cabbage', baseCost: 110, seasons: ['春','夏'], pickleDays: 2, hint: '柔らかく甘い', flavors: ['甘味','さっぱり'] },
+  { id: 'fukinotou', name: 'ふきのとう', sprite: 'myoga', baseCost: 160, seasons: ['春'],         pickleDays: 1, hint: '春の苦み・ぴりっと', flavors: ['辛口','さっぱり'] },
+
+  // === 夏 ===
   { id: 'nasu', name: 'なす',       sprite: 'nasu',     baseCost: 130, seasons: ['夏','秋'],          pickleDays: 2, hint: '夏の風物詩', flavors: ['さっぱり','塩辛'] },
   { id: 'myoga', name: 'みょうが',   sprite: 'myoga',    baseCost: 180, seasons: ['夏'],               pickleDays: 1, hint: '夏限定・香り辛味', flavors: ['辛口','さっぱり'] },
-  { id: 'takenoko', name: 'たけのこ', sprite: 'takenoko', baseCost: 250, seasons: ['春'],               pickleDays: 3, hint: '春の高級品', flavors: ['さっぱり','甘味'] },
-  { id: 'yamaimo', name: '山芋',     sprite: 'yamaimo',  baseCost: 200, seasons: ['秋','冬'],          pickleDays: 2, hint: '秋の山の幸', flavors: ['甘味'] },
-  { id: 'rakkyo', name: 'らっきょう', sprite: 'rakkyo',   baseCost: 140, seasons: ['初夏','夏'],        pickleDays: 4, hint: '辛味と酸味', flavors: ['辛口','酸味'] },
   { id: 'ume',  name: '梅',         sprite: 'ume',      baseCost: 220, seasons: ['夏'],               pickleDays: 5, hint: '梅干しに・酸っぱい', flavors: ['酸味','塩辛'] },
-  { id: 'shiba', name: 'みょうが菜',  sprite: 'shibazuke', baseCost: 170, seasons: ['夏','秋'],         pickleDays: 2, hint: 'しば漬けの素・赤しそ', flavors: ['酸味','辛口'] },
+  { id: 'rakkyo', name: 'らっきょう', sprite: 'rakkyo',   baseCost: 140, seasons: ['夏'],              pickleDays: 4, hint: '辛味と酸味', flavors: ['辛口','酸味'] },
+  { id: 'shoga_new', name: '新生姜',  sprite: 'ginger',   baseCost: 110, seasons: ['夏'],              pickleDays: 1, hint: '夏の辛味・ガリに', flavors: ['辛口'] },
+  { id: 'tomato', name: 'トマト',    sprite: 'ume',      baseCost: 150, seasons: ['夏'],               pickleDays: 1, hint: '夏の酸味・浅漬けに', flavors: ['酸味','さっぱり'] },
+
+  // === 秋 ===
+  { id: 'ginger', name: '生姜',     sprite: 'ginger',   baseCost: 100, seasons: ['秋'],              pickleDays: 1, hint: '辛口の定番', flavors: ['辛口'] },
+  { id: 'yamaimo', name: '山芋',     sprite: 'yamaimo',  baseCost: 200, seasons: ['秋','冬'],          pickleDays: 2, hint: '秋の山の幸・ほの甘い', flavors: ['甘味'] },
+  { id: 'shiba', name: '赤しそ',    sprite: 'shibazuke', baseCost: 170, seasons: ['夏','秋'],         pickleDays: 2, hint: 'しば漬けの素・酸味', flavors: ['酸味','辛口'] },
+  { id: 'kabu', name: 'かぶ',       sprite: 'daikon',   baseCost: 100, seasons: ['秋','冬'],          pickleDays: 2, hint: '甘酢漬けに・優しい甘み', flavors: ['甘味','さっぱり'] },
+
+  // === 冬(漬物野菜が豊富な季節) ===
+  { id: 'cabbage', name: '白菜',    sprite: 'cabbage',  baseCost: 150, seasons: ['秋','冬'],          pickleDays: 2, hint: '冬の定番・キムチにも', flavors: ['さっぱり','塩辛'] },
+  { id: 'daikon_winter', name: '冬大根', sprite: 'daikon', baseCost: 130, seasons: ['冬'],            pickleDays: 3, hint: '甘みの増した大根', flavors: ['甘味','塩辛'] },
+  { id: 'nozawana', name: '野沢菜',  sprite: 'cabbage',  baseCost: 140, seasons: ['冬'],               pickleDays: 3, hint: '冬の葉物・素朴な味', flavors: ['塩辛','さっぱり'] },
+  { id: 'yuzu', name: 'ゆず',       sprite: 'carrot',   baseCost: 190, seasons: ['冬'],               pickleDays: 2, hint: '冬の香り・爽やかな酸味', flavors: ['酸味','さっぱり'] },
 ];
 
 // rakkyo の seasons を正規化
@@ -2393,26 +2433,34 @@ const RECIPES = [
   },
 
   // === 料理レシピ(漬物を加工品にして高値で売る) ===
+  // 各加工品には flavor(味属性)があり、客の好みに合うと買われやすい
   // 浅漬けベース
   {
     id: 'shibazuke_dish', name: 'しば漬け和え', type: 'dish',
     desc: '浅漬けを¥300の小鉢に',
-    icon: '🥢',
+    icon: '🥢', flavor: '酸味',
     condition: { soldAsa: 5 },
     consume: 'asa', produces: 300,
   },
   {
     id: 'asazuke_salad', name: '浅漬けサラダ', type: 'dish',
     desc: '浅漬けを¥350のさっぱり一品に',
-    icon: '🥗',
+    icon: '🥗', flavor: 'さっぱり',
     condition: { soldAsa: 12 },
     consume: 'asa', produces: 350,
   },
   {
     id: 'cold_soba_topping', name: '冷やしそばの薬味', type: 'dish',
-    desc: '浅漬けを¥400の薬味セットに',
-    icon: '🍜',
+    desc: '浅漬けを¥400の薬味セットに(夏)',
+    icon: '🍜', flavor: 'さっぱり',
     condition: { soldAsa: 20, seasonReached: '夏' },
+    consume: 'asa', produces: 400,
+  },
+  {
+    id: 'amazu_zuke', name: '甘酢漬け', type: 'dish',
+    desc: '浅漬けを¥400の甘酸っぱい一品に',
+    icon: '🍯', flavor: '甘味',
+    condition: { soldAsa: 15 },
     consume: 'asa', produces: 400,
   },
 
@@ -2420,67 +2468,90 @@ const RECIPES = [
   {
     id: 'oshinko_maki', name: 'おしんこ巻き', type: 'dish',
     desc: '食べごろを¥450の加工品に',
-    icon: '🍙',
+    icon: '🍙', flavor: 'さっぱり',
     condition: { soldGood: 5 },
     consume: 'good', produces: 450,
   },
   {
     id: 'onigiri_set', name: 'おにぎりの友', type: 'dish',
     desc: '食べごろを¥500のセットに',
-    icon: '🍘',
+    icon: '🍘', flavor: '塩辛',
     condition: { soldGood: 12 },
     consume: 'good', produces: 500,
   },
   {
     id: 'bento_kit', name: 'お弁当用詰合せ', type: 'dish',
     desc: '食べごろを¥600の弁当用に',
-    icon: '🍱',
+    icon: '🍱', flavor: '塩辛',
     condition: { soldGood: 20 },
     consume: 'good', produces: 600,
+  },
+  {
+    id: 'bettara', name: 'べったら漬け', type: 'dish',
+    desc: '食べごろを¥500の甘い名物に(子供に人気)',
+    icon: '🍬', flavor: '甘味',
+    condition: { soldGood: 10 },
+    consume: 'good', produces: 500,
   },
 
   // 古漬けベース
   {
     id: 'ochazuke', name: 'お茶漬けの素', type: 'dish',
     desc: '古漬けを¥350の加工品に',
-    icon: '🍵',
+    icon: '🍵', flavor: '酸味',
     condition: { soldFuru: 5 },
     consume: 'furu', produces: 350,
   },
   {
     id: 'sake_otsumami', name: 'お酒の肴', type: 'dish',
     desc: '古漬けを¥500の高級つまみに',
-    icon: '🍶',
+    icon: '🍶', flavor: '塩辛',
     condition: { soldFuru: 12 },
     consume: 'furu', produces: 500,
   },
   {
     id: 'pickle_chazuke_premium', name: '高級茶漬けセット', type: 'dish',
     desc: '古漬けを¥700の進物用に',
-    icon: '🎁',
+    icon: '🎁', flavor: '酸味',
     condition: { soldFuru: 20, totalRevenue: 10000 },
     consume: 'furu', produces: 700,
+  },
+
+  // キムチ(朝鮮漬け)系・辛口
+  {
+    id: 'kimchi', name: 'キムチ(朝鮮漬け)', type: 'dish',
+    desc: '食べごろを¥550の辛い漬物に(サラリーマンに人気)',
+    icon: '🌶️', flavor: '辛口',
+    condition: { soldGood: 8, soldFuru: 3 },
+    consume: 'good', produces: 550,
+  },
+  {
+    id: 'kakuteki', name: 'カクテキ', type: 'dish',
+    desc: '古漬けを¥600の辛口大根漬けに',
+    icon: '🔥', flavor: '辛口',
+    condition: { soldFuru: 15 },
+    consume: 'furu', produces: 600,
   },
 
   // 看板娘特製レシピ
   {
     id: 'ume_inakazuke_jar', name: 'お梅特製・田舎漬け詰め', type: 'dish',
     desc: '食べごろを¥550のお土産品に',
-    icon: '🌾',
+    icon: '🌾', flavor: '塩辛',
     condition: { girlJoined: 'ume', daysAfter: 7 },
     consume: 'good', produces: 550,
   },
   {
     id: 'kiku_branded', name: 'お菊銘柄・選び抜き', type: 'dish',
     desc: '食べごろを¥800のブランド品に',
-    icon: '✨',
+    icon: '✨', flavor: '甘味',
     condition: { girlJoined: 'kiku', daysAfter: 7, totalRevenue: 15000 },
     consume: 'good', produces: 800,
   },
   {
     id: 'yuki_kobachi', name: 'お雪の小鉢仕立て', type: 'dish',
     desc: '浅漬けを¥600の料亭風に',
-    icon: '🌸',
+    icon: '🌸', flavor: 'さっぱり',
     condition: { girlJoined: 'yuki', daysAfter: 7 },
     consume: 'asa', produces: 600,
   },
@@ -2871,6 +2942,19 @@ function restoreFromSave(saveData) {
 const RANKING_KEY = 'oshinkoya_ranking_v1';
 const MAX_RANKING = 10;
 
+// ▼▼▼ オンラインランキング設定(Firebase Realtime Database) ▼▼▼
+// 使い方:
+// 1. https://console.firebase.google.com/ でプロジェクトを作成
+// 2. 「Realtime Database」を作成(テストモードで開始)
+// 3. プロジェクト設定 > 全般 > マイアプリ(ウェブ </>)を追加
+// 4. 表示される databaseURL を下の FIREBASE_DB_URL に貼り付ける
+//    例: https://oshinkoya-xxxx-default-rtdb.firebaseio.com
+// 5. 空文字のままだとオンライン機能はオフ(ローカルのみ)になる
+const FIREBASE_DB_URL = 'https://oshinkoya-b4967-default-rtdb.firebaseio.com'; // ← ここにあなたのdatabaseURLを貼る
+// ▲▲▲ ここまで ▲▲▲
+
+const ONLINE_RANKING_ENABLED = () => FIREBASE_DB_URL && FIREBASE_DB_URL.startsWith('http');
+
 function loadRanking() {
   try {
     const raw = localStorage.getItem(RANKING_KEY);
@@ -2891,7 +2975,7 @@ function addToRanking(entry) {
 }
 
 function recordCurrentGame(endingType) {
-  return addToRanking({
+  const entry = {
     shopName: game.shopName,
     chapter: game.chapter,
     money: game.money,
@@ -2902,7 +2986,47 @@ function recordCurrentGame(endingType) {
     reputation: game.reputation,
     endingType: endingType,
     date: new Date().toISOString(),
-  });
+  };
+  // ローカルに記録
+  const rank = addToRanking(entry);
+  // オンラインにも送信(設定済みの場合)
+  if (ONLINE_RANKING_ENABLED()) {
+    submitOnlineScore(entry);
+  }
+  return rank;
+}
+
+// オンラインにスコアを送信(Firebase REST API)
+function submitOnlineScore(entry) {
+  try {
+    fetch(`${FIREBASE_DB_URL}/scores.json`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(entry),
+    }).catch(e => console.log('オンライン送信失敗:', e));
+  } catch (e) {
+    console.log('オンライン送信エラー:', e);
+  }
+}
+
+// オンラインランキングを取得(総売上トップ20)
+async function fetchOnlineRanking() {
+  if (!ONLINE_RANKING_ENABLED()) return null;
+  try {
+    // 総売上順で上位を取得(Firebaseのクエリ)
+    const url = `${FIREBASE_DB_URL}/scores.json?orderBy="totalRevenue"&limitToLast=20`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data) return [];
+    // オブジェクト→配列に変換して降順ソート
+    const arr = Object.values(data);
+    arr.sort((a, b) => b.totalRevenue - a.totalRevenue);
+    return arr.slice(0, 20);
+  } catch (e) {
+    console.log('オンライン取得エラー:', e);
+    return null;
+  }
 }
 
 
@@ -2919,6 +3043,29 @@ function getBarrelStatus(barrel) {
   if (age <= goodEnd) return { stage: 'good', label: '食べごろ', mult: 1.0 };
   if (age <= furuEnd) return { stage: 'furu', label: '古漬け', mult: 0.85 };
   return { stage: 'bad', label: '傷み', mult: 0 };
+}
+
+// 漬物の「実際の味」を熟成度を加味して返す
+// 浅漬け=元の味+さっぱり寄り / 古漬け=酸味と塩辛が増す
+function getEffectiveFlavors(barrel) {
+  if (!barrel) return [];
+  const veg = VEGETABLES.find(v => v.id === barrel.vegId);
+  const base = veg.flavors ? [...veg.flavors] : [];
+  const status = getBarrelStatus(barrel);
+  if (!status) return base;
+
+  const flavors = new Set(base);
+  if (status.stage === 'asa') {
+    // 浅漬けは爽やかさが出る
+    flavors.add('さっぱり');
+  } else if (status.stage === 'furu') {
+    // 古漬けは発酵で酸味が増し、塩辛さも出る
+    flavors.add('酸味');
+    flavors.add('塩辛');
+    // 浅い爽やかさは失われる
+    flavors.delete('さっぱり');
+  }
+  return Array.from(flavors);
 }
 
 function addLog(text, cls = '') {
@@ -3317,11 +3464,12 @@ function renderPickle(main, footer, banner) {
       if (isFull) { btnText = '在庫満杯'; btnClass = ''; }
       else if (usableBarrels.length === 0) { btnText = stageJp + 'なし'; btnClass = ''; }
       else { btnText = '作る'; btnClass = 'primary'; }
+      const recipeFlavorChip = r.flavor ? `<span class="flavor-chip flavor-${r.flavor}">${r.flavor}</span>` : '';
       html += `
         <div class="dish-recipe-row ${canMake ? 'can-make' : 'cannot-make'}">
           <span class="dish-icon">${r.icon}</span>
           <div class="dish-info">
-            <div class="dish-name">${r.name} <span class="dish-price-tag">¥${r.produces}</span></div>
+            <div class="dish-name">${r.name} <span class="dish-price-tag">¥${r.produces}</span> ${recipeFlavorChip}</div>
             <div class="dish-desc">${stageJp}の樽が必要(消費なし)</div>
           </div>
           <button class="${btnClass}" onclick="makeDish('${r.id}')" ${canMake ? '' : 'disabled'}>${btnText}</button>
@@ -3349,10 +3497,11 @@ function renderPickle(main, footer, banner) {
     if (game.dishes.length > 0) {
       html += `<div class="dish-stock-title">📦 加工品在庫(タップで店頭/倉庫を切替)</div>`;
       game.dishes.forEach((d, i) => {
+        const flavorChip = d.flavor ? `<span class="flavor-chip flavor-${d.flavor}">${d.flavor}</span>` : '';
         html += `
           <div class="dish-stock-row ${d.display ? 'on-display' : 'in-stock'}" onclick="toggleDishDisplay(${i})">
             <span class="dish-icon">${d.icon}</span>
-            <span class="dish-name" style="flex:1;">${d.name}</span>
+            <span class="dish-name" style="flex:1;">${d.name} ${flavorChip}</span>
             <span class="dish-price">¥${d.price}</span>
             <span class="dish-display-tag">${d.display ? '🏪 店頭' : '📥 倉庫'}</span>
             <span class="dish-discard-btn" onclick="event.stopPropagation(); discardDish(${i})">✕</span>
@@ -3387,6 +3536,7 @@ window.makeDish = function(recipeId) {
     name: r.name + `(${veg.name})`,
     price: r.produces,
     icon: r.icon,
+    flavor: r.flavor || null,
     display: true, // デフォルトで店頭
   });
   addLog(`${r.name}を作った(${veg.name}の${r.consume === 'asa' ? '浅漬け' : r.consume === 'good' ? '食べごろ' : '古漬け'}を使用)`);
@@ -3660,10 +3810,11 @@ function renderServing(main, footer, banner) {
       preferClass = 'match-bad';
     }
 
-    // 味マッチング
+    // 味マッチング(熟成による味変化を考慮)
     let flavorMark = '';
     let flavorClass = '';
-    const flavorMatched = veg.flavors && customer.flavorPrefer && veg.flavors.includes(customer.flavorPrefer);
+    const effFlavors = getEffectiveFlavors(b);
+    const flavorMatched = customer.flavorPrefer && effFlavors.includes(customer.flavorPrefer);
     if (flavorMatched) {
       flavorMark = '★味◎';
       flavorClass = 'match-good';
@@ -3687,7 +3838,7 @@ function renderServing(main, footer, banner) {
     const isHighMatch = (status.stage === customer.prefer) && flavorMatched;
     const matchBadge = isHighMatch ? '<span class="match-badge">★ 推奨</span>' : '';
     const rowClass = isHighMatch ? 'match-flavor' : '';
-    const flavorChips = veg.flavors ? veg.flavors.map(f => `<span class="flavor-chip flavor-${f}">${f}</span>`).join(' ') : '';
+    const flavorChips = effFlavors.map(f => `<span class="flavor-chip flavor-${f}">${f}</span>`).join(' ');
 
     html += `
       <div class="sell-row ${rowClass}">
@@ -3711,12 +3862,16 @@ function renderServing(main, footer, banner) {
     html += `<div class="card-title" style="margin-top:6px;">🍱 加工品</div>`;
     game.dishes.forEach((d, di) => {
       if (!d.display) return;
+      const dishFlavorMatch = d.flavor && customer.flavorPrefer && d.flavor === customer.flavorPrefer;
+      const flavorChip = d.flavor ? `<span class="flavor-chip flavor-${d.flavor}">${d.flavor}</span>` : '';
+      const matchBadge = dishFlavorMatch ? '<span class="match-badge">★ 推奨</span>' : '';
+      const rowClass = dishFlavorMatch ? 'match-flavor' : '';
       html += `
-        <div class="sell-row">
+        <div class="sell-row ${rowClass}">
           <div style="font-size:24px;width:32px;text-align:center;">${d.icon}</div>
           <div class="item-info">
-            <div class="item-name">${d.name}</div>
-            <div class="item-detail">¥${d.price} · 加工品</div>
+            <div class="item-name">${d.name}${matchBadge}</div>
+            <div class="item-detail">${flavorChip} ¥${d.price} · 加工品</div>
           </div>
           <button class="primary" onclick="offerDish(${di})">薦める</button>
         </div>
@@ -3756,8 +3911,25 @@ window.offerDish = function(dishIdx) {
   const dish = game.dishes[dishIdx];
   if (!dish) return;
   const customer = sellState.currentCustomer;
-  // 加工品は誰でもほぼ買う(価格判定だけ)・予算が一番低い客以外は買う
-  const willBuy = customer.priceTolerance >= 0.9 || dish.price <= 350;
+
+  // 味マッチ判定: 加工品の味が客の好みと一致すると買われやすい
+  const flavorMatch = dish.flavor && customer.flavorPrefer && dish.flavor === customer.flavorPrefer;
+
+  // 価格の許容(加工品は割高だが、味が合えば許容度が上がる)
+  let willBuy;
+  let response;
+  if (flavorMatch) {
+    // 好みの味なら高くても買う
+    willBuy = true;
+    response = `「これ、${dish.flavor}で好みなの!いただくわ」`;
+  } else if (customer.priceTolerance >= 0.9 || dish.price <= 400) {
+    // 予算に余裕がある客 or 安めなら買う
+    willBuy = true;
+    response = '「これ気になってたの、いただくわ」';
+  } else {
+    willBuy = false;
+    response = '「うーん、今日はやめておくよ」';
+  }
 
   if (willBuy) {
     game.money += dish.price;
@@ -3768,22 +3940,22 @@ window.offerDish = function(dishIdx) {
     game.dishes.splice(dishIdx, 1);
     game.totalSold++;
     game.totalRevenue += dish.price;
-    addLog(`${customer.name}が${dish.name}を¥${dish.price}で購入`, '');
-    game.reputation = Math.min(100, game.reputation + 2);
+    addLog(`${customer.name}が${dish.name}を¥${dish.price}で購入${flavorMatch ? '(味◎)' : ''}`, '');
+    game.reputation = Math.min(100, game.reputation + (flavorMatch ? 3 : 2));
     showModal('🛒 お買い上げ',
       `<div class="center">
         <canvas data-sprite="${customer.sprite}" style="width:64px;height:64px;image-rendering:pixelated;"></canvas>
-        <p style="margin:8px 0;">「これ気になってたの!いただくわ」</p>
-        <p style="color:#8b2828;font-size:13px;">¥${dish.price} 受け取り!</p>
+        <p style="margin:8px 0;">${response}</p>
+        <p style="color:#8b2828;font-size:13px;">¥${dish.price} 受け取り!${flavorMatch ? ' ★味が好み' : ''}</p>
       </div>`,
       [{ label: '次のお客へ ▶', action: () => { closeModal(); nextCustomer(); } }]
     );
   } else {
-    addLog(`${customer.name}は加工品を断った`, 'bad');
+    addLog(`${customer.name}は${dish.name}を断った`, 'bad');
     showModal('👋 残念',
       `<div class="center">
         <canvas data-sprite="${customer.sprite}" style="width:64px;height:64px;image-rendering:pixelated;"></canvas>
-        <p style="margin:8px 0;">「今日は手作りの方がいいかな...」</p>
+        <p style="margin:8px 0;">${response}</p>
       </div>`,
       [{ label: '次のお客へ ▶', action: () => { closeModal(); nextCustomer(); } }]
     );
@@ -3805,8 +3977,9 @@ window.offerItem = function(idx) {
   if (status.stage === customer.prefer) likeMult = 1.4;
   else if (status.stage === 'good') likeMult = 1.0;
 
-  // 味マッチング: 客の好みの味が漬物の属性にあれば+0.3、なければ変動なし
-  const flavorMatch = veg.flavors && customer.flavorPrefer && veg.flavors.includes(customer.flavorPrefer);
+  // 味マッチング: 客の好みの味が漬物の属性にあれば+0.3(熟成変化を考慮)
+  const effFlavors = getEffectiveFlavors(barrel);
+  const flavorMatch = customer.flavorPrefer && effFlavors.includes(customer.flavorPrefer);
   if (flavorMatch) likeMult += 0.3;
 
   const fairPrice = cost * 1.8;
@@ -4780,37 +4953,78 @@ window.showRecipeBook = function() {
   $('modal').classList.remove('hidden');
 };
 
-function showRanking() {
-  const ranking = loadRanking();
-  $('modal-header').textContent = '🏆 歴代ランキング';
-
-  if (ranking.length === 0) {
-    $('modal-body').innerHTML = `
-      <div class="center" style="padding:20px;">
-        <p style="font-size:13px;">まだ記録がありません。</p>
-        <p class="small" style="margin-top:8px;">店を引退すると、ここに記録が残ります。</p>
+function renderRankingList(ranking) {
+  if (!ranking || ranking.length === 0) {
+    return `<div class="center" style="padding:20px;">
+      <p style="font-size:13px;">まだ記録がありません。</p>
+      <p class="small" style="margin-top:8px;">店を引退すると、ここに記録が残ります。</p>
+    </div>`;
+  }
+  let html = `<div class="ranking-list">`;
+  ranking.forEach((e, i) => {
+    const cls = i === 0 ? 'first' : i === 1 ? 'second' : i === 2 ? 'third' : '';
+    const date = e.date ? new Date(e.date) : null;
+    const dateStr = date ? `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}` : '';
+    html += `
+      <div class="ranking-entry ${cls}">
+        <span class="rank-num">${i + 1}</span>
+        <div class="rank-info">
+          <div class="shop">${e.shopName || '名無し漬物店'}</div>
+          <div class="meta">第${e.chapter}週 / ${e.endingType || '?'} / ${dateStr}</div>
+        </div>
+        <div class="rank-revenue">¥${(e.totalRevenue||0).toLocaleString()}</div>
       </div>
     `;
-  } else {
-    let html = `<div class="ranking-list">`;
-    ranking.forEach((e, i) => {
-      const cls = i === 0 ? 'first' : i === 1 ? 'second' : i === 2 ? 'third' : '';
-      const date = e.date ? new Date(e.date) : null;
-      const dateStr = date ? `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}` : '';
-      html += `
-        <div class="ranking-entry ${cls}">
-          <span class="rank-num">${i + 1}</span>
-          <div class="rank-info">
-            <div class="shop">${e.shopName || '名無し漬物店'}</div>
-            <div class="meta">第${e.chapter}週 / ${e.endingType || '?'} / ${dateStr}</div>
-          </div>
-          <div class="rank-revenue">¥${e.totalRevenue.toLocaleString()}</div>
-        </div>
-      `;
-    });
-    html += `</div>`;
-    $('modal-body').innerHTML = html;
+  });
+  html += `</div>`;
+  return html;
+}
+
+function showRanking() {
+  $('modal-header').textContent = '🏆 歴代ランキング';
+
+  // オンライン未設定ならローカルのみ表示(従来通り)
+  if (!ONLINE_RANKING_ENABLED()) {
+    $('modal-body').innerHTML = renderRankingList(loadRanking());
+    $('modal-buttons').innerHTML = '';
+    const btn = document.createElement('button');
+    btn.textContent = '▶ 閉じる';
+    btn.className = 'primary';
+    btn.onclick = closeModal;
+    $('modal-buttons').appendChild(btn);
+    $('modal').classList.remove('hidden');
+    return;
   }
+
+  // オンライン有効ならタブ切替UI
+  const renderTabs = (active) => {
+    $('modal-body').innerHTML = `
+      <div class="ranking-tabs">
+        <button class="ranking-tab ${active === 'local' ? 'active' : ''}" onclick="switchRankingTab('local')">📱 自分の記録</button>
+        <button class="ranking-tab ${active === 'online' ? 'active' : ''}" onclick="switchRankingTab('online')">🌐 全国ランキング</button>
+      </div>
+      <div id="ranking-content"></div>
+    `;
+  };
+
+  window.switchRankingTab = async function(tab) {
+    renderTabs(tab);
+    const content = document.getElementById('ranking-content');
+    if (tab === 'local') {
+      content.innerHTML = renderRankingList(loadRanking());
+    } else {
+      content.innerHTML = `<div class="center" style="padding:20px;"><p class="small">全国ランキングを読み込み中...</p></div>`;
+      const online = await fetchOnlineRanking();
+      if (online === null) {
+        content.innerHTML = `<div class="center" style="padding:20px;"><p class="small" style="color:#8b2828;">読み込みに失敗しました。<br>通信環境を確認してください。</p></div>`;
+      } else {
+        content.innerHTML = renderRankingList(online);
+      }
+    }
+  };
+
+  renderTabs('local');
+  document.getElementById('ranking-content').innerHTML = renderRankingList(loadRanking());
 
   $('modal-buttons').innerHTML = '';
   const btn = document.createElement('button');
