@@ -129,6 +129,27 @@
     letter-spacing: 1px;
   }
   .header-retire-btn.hidden { display: none !important; }
+
+  /* ヘッダーのタイトル戻りボタン */
+  .header-home-btn {
+    background: var(--green-dark);
+    color: var(--paper);
+    border: 2px solid var(--gold);
+    margin-left: 4px;
+    padding: 6px 8px;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    box-shadow: 2px 2px 0 #000;
+    flex-shrink: 0;
+  }
+  .header-home-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #000;
+  }
+  .header-home-btn.hidden { display: none !important; }
   .stats .day { color: var(--paper); }
 
   /* メイン領域 */
@@ -1693,6 +1714,7 @@
       <div class="day" id="day-display">1日目 / 春</div>
       <div class="money" id="money-display">¥3000</div>
     </div>
+    <button class="header-home-btn hidden" id="header-home-btn" onclick="returnToTitleConfirm()" title="タイトルへ">🏠</button>
     <button class="header-retire-btn hidden" id="header-retire-btn" onclick="retireConfirm()" title="引退する">🌅<span class="retire-label">引退</span></button>
   </div>
 
@@ -3119,12 +3141,11 @@ function updateHeader() {
   $('shop-name').textContent = game.shopName;
   $('day-display').innerHTML = `第${game.chapter}週 ${game.weekDay}/7日 ${SEASON_ICONS[game.season]}`;
   $('money-display').textContent = `¥${game.money.toLocaleString()}`;
-  // 第3週以降は引退ボタン常設表示
+  // タイトル戻りボタンと引退ボタンを常設表示
+  const homeBtn = $('header-home-btn');
   const retireBtn = $('header-retire-btn');
-  if (retireBtn) {
-    if (game.chapter >= 3) retireBtn.classList.remove('hidden');
-    else retireBtn.classList.add('hidden');
-  }
+  if (homeBtn) homeBtn.classList.remove('hidden');
+  if (retireBtn) retireBtn.classList.remove('hidden');
 }
 
 // ============================================================
@@ -4182,7 +4203,8 @@ window.retireConfirm = function() {
       <p style="margin:8px 0;">店を譲って引退しますか?</p>
       <p class="small" style="color:#5a7a3a;margin:8px 0;">
         これまでの歩みを振り返ります。<br>
-        引退すれば、これまでの結果でエンディングを迎えます。
+        引退すれば、これまでの結果でエンディングを迎え、<br>
+        ランキングにも登録されます。
       </p>
     </div>`,
     [
@@ -4191,6 +4213,71 @@ window.retireConfirm = function() {
     ]
   );
 };
+
+// タイトルに戻る確認(セーブはそのまま・ランキング登録は任意)
+window.returnToTitleConfirm = function() {
+  showModal(
+    '🏠 タイトルへ戻る',
+    `<div class="center">
+      <p style="margin:8px 0;">タイトル画面に戻りますか?</p>
+      <p class="small" style="color:#5a7a3a;margin:6px 0;">
+        進行状況はセーブされているので、<br>
+        後で「続きから」で再開できます。
+      </p>
+      <p class="small" style="color:#8b2828;margin:6px 0;">
+        ※ 現時点の成績をランキング登録もできます<br>
+        (ゲームはそのまま続けられます)
+      </p>
+    </div>`,
+    [
+      { label: 'キャンセル', action: closeModal },
+      { label: 'ランキング登録', action: () => {
+          closeModal();
+          registerMidGameRanking();
+        }
+      },
+      { label: 'タイトルへ', action: () => {
+          saveGame();
+          closeModal();
+          returnToTitle();
+        }
+      },
+    ]
+  );
+};
+
+// 途中経過をランキング登録(ゲーム継続)
+function registerMidGameRanking() {
+  // 仮の終了タイプとして「途中経過」を使う
+  const rank = recordCurrentGame('途中経過');
+  showModal(
+    '🏆 ランキング登録',
+    `<div class="center">
+      <p style="margin:8px 0;font-size:13px;">現時点の成績を登録しました。</p>
+      <div class="result-grid">
+        <span class="label">所持金</span><span class="value gold">¥${game.money.toLocaleString()}</span>
+        <span class="label">総売上</span><span class="value">¥${game.totalRevenue.toLocaleString()}</span>
+        <span class="label">第${game.chapter}週</span><span class="value">${game.weekDay}/7日目</span>
+      </div>
+      ${rank > 0 ? `<div class="ranking-result">🏆 自分の記録 第${rank}位!</div>` : ''}
+      <p class="small" style="color:#5a7a3a;margin-top:10px;">ゲームはこのまま続けられます</p>
+    </div>`,
+    [{ label: '▶ 続ける', action: closeModal }]
+  );
+}
+
+// タイトル画面に戻る(セーブはキープ)
+function returnToTitle() {
+  // ヘッダーボタンを隠す
+  const homeBtn = $('header-home-btn');
+  const retireBtn = $('header-retire-btn');
+  if (homeBtn) homeBtn.classList.add('hidden');
+  if (retireBtn) retireBtn.classList.add('hidden');
+  $('title-screen').style.display = 'flex';
+  $('main-area').innerHTML = '';
+  $('footer').innerHTML = '';
+  showTitle();
+}
 
 window.nextDay = function() {
   // 樽の経過日数を進める
@@ -4781,6 +4868,12 @@ function resetGame() {
 }
 
 function showTitle() {
+  // タイトル画面表示時はヘッダーのタイトル戻り/引退ボタンを隠す
+  const homeBtn = $('header-home-btn');
+  const retireBtn = $('header-retire-btn');
+  if (homeBtn) homeBtn.classList.add('hidden');
+  if (retireBtn) retireBtn.classList.add('hidden');
+
   // タイトル画面のドット絵を描画
   drawSprite($('title-spr-1'), 'cucumber');
   drawSprite($('title-spr-2'), 'daikon');
