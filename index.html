@@ -3650,6 +3650,14 @@ function renderSell(main, footer, banner) {
       revenueToday: 0,
       currentCustomer: null,
     };
+  } else {
+    // sellState既存だが、新しく仕入れた樽の値段が未設定の場合は補完
+    game.barrels.forEach((b, i) => {
+      if (b && (sellState.prices[i] === undefined || sellState.prices[i] === null)) {
+        const veg = VEGETABLES.find(v => v.id === b.vegId);
+        sellState.prices[i] = Math.round(getCurrentCost(veg) * 1.8 / 10) * 10;
+      }
+    });
   }
 
   if (sellState.stage === 'pricing') renderPricing(main, footer, banner);
